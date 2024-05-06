@@ -28,7 +28,6 @@ app.use(cors());
 mongoose.connect("mongodb+srv://tracker:tracker-123456@cluster0.ot5fa5d.mongodb.net/ExpensiveTracker");
 
 
-// Endpoint to check database connection status
 app.get('/check-db-connection', (req, res) => {
     const dbStatus = mongoose.connection.readyState;
     if (dbStatus === 1) {
@@ -37,7 +36,6 @@ app.get('/check-db-connection', (req, res) => {
         res.status(500).json({ message: 'Failed to connect to database' });
     }
 });
-
 
 const JWT_SECRET = 'h7K#p5Z@u$9!a2Ys'
 
@@ -49,10 +47,8 @@ app.post('/register', (req, res) => {
 });
 
 
-// Endpoint to fetch all users
 app.get('/users', async (req, res) => {
     try {
-        // Fetch all user documents from the ExpensiveTracker collection
         const users = await ExpensiveTrackerModel.find();
         res.json(users);
     } catch (error) {
@@ -61,8 +57,6 @@ app.get('/users', async (req, res) => {
     }
 });
 
-
-// Login route
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
     ExpensiveTrackerModel
@@ -86,8 +80,6 @@ app.post("/login", (req, res) => {
         });
 });
 
-
-
 app.post("/updatetoken", (req, res) => {
     try {
         const expirationTime = Math.floor(Date.now() / 1000) + 60; 
@@ -98,11 +90,6 @@ app.post("/updatetoken", (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 });
-
-
-
-
-
 
 app.post('/transactions', (req, res) => {
     TransactionModel
@@ -121,7 +108,15 @@ app.get('/get-transactions', async (req, res) => {
     }
 });
 
-
+app.delete('/transactions/:id', (req, res) => {
+    const transactionId = req.params.id;
+    GetTransaction.findByIdAndDelete(transactionId)
+        .then(() => res.json({ message: 'Transaction deleted successfully' }))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to delete transaction' });
+        });
+});
 
 function authenticateToken(req, res, next) {
     const token = req.headers['authorization'];
@@ -143,7 +138,6 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Server Error' });
 });
 
-// Start server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
