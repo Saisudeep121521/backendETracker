@@ -49,6 +49,19 @@ app.post('/register', (req, res) => {
 });
 
 
+// Endpoint to fetch all users
+app.get('/users', async (req, res) => {
+    try {
+        // Fetch all user documents from the ExpensiveTracker collection
+        const users = await ExpensiveTrackerModel.find();
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+
 // Login route
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
